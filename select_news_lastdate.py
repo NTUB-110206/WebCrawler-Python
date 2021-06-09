@@ -9,7 +9,7 @@ def select_news_lastdate(website):
         params = config()
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
-        cur.execute("SELECT news_datetime FROM news WHERE news_website=%s ORDER BY news_datetime desc LIMIT 1", (website,))
+        cur.execute("SELECT news_datetime FROM bcd_news WHERE news_website=%s ORDER BY news_datetime desc LIMIT 1", (website,))
         print("The number of parts: ", cur.rowcount)
         row = cur.fetchone()
 

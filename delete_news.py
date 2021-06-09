@@ -14,7 +14,7 @@ def delete_news(website):
         # create a new cursor
         cur = conn.cursor()
         # execute the UPDATE  statement
-        cur.execute("DELETE FROM news WHERE news_website = %s", (website,))
+        cur.execute("DELETE FROM bcd_news WHERE news_website = %s", (website,))
         # get the number of updated rows
         rows_deleted = cur.rowcount
         # Commit the changes to the database

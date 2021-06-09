@@ -4,7 +4,7 @@ from config import config
 def insert_news_list(news_list):
     """ insert multiple news into the news table  """
     # sql = "INSERT INTO vendors(vendor_name) VALUES(%s)"
-    sql = "INSERT INTO news(news_datetime, news_title, news_content, news_website, news_link) VALUES(%s,%s,%s,%s,%s)"
+    sql = "INSERT INTO bcd_news(news_datetime, news_title, news_content, news_website, news_link, img_link) VALUES(%s,%s,%s,%s,%s,%s)"
     conn = None
     try:
         # read database configuration
