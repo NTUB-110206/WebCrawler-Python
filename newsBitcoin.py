@@ -21,18 +21,23 @@ def link_into_array(huge,large,medium,small,tiny):
   print(np_hyperlink)
   print(len(np_hyperlink))
   return np_hyperlink
+
+
 if __name__ == '__main__':
   website="NEWS.BITCOIN"
+  lastnews=str(select_news_lastdate(website))
+  print(lastnews)
+  # lastnews="2015-06-09T08:28:12.817Z"
   url = 'https://news.bitcoin.com/'
   r = requests.get(url)
   soup = BeautifulSoup(r.text,"html.parser") #將網頁資料以html.parser
   total_page_number = (soup.select("div.page-nav.td-pb-padding-side a.last")[0].text).replace(',', '') #
   print('總頁數: '+total_page_number+' 頁\n')
-  total_page_number=3
-  for i in range(1, int(3)+1):
+  hyperlink = np.array([]) #存連結用的
+  for i in range(1, int(total_page_number)+1): #從page1爬到最後一頁
     news_list=[] #宣告tuple 將news存到tuple，再一起進資料庫
     print(type(news_list))
-    print(i)
+    print("i",i)
     uuu=url+'page/'+str(i)
     r = requests.get(uuu)
     soup = BeautifulSoup(r.text,"html.parser") #將網頁資料以html.parser
@@ -41,8 +46,13 @@ if __name__ == '__main__':
     medium = soup.select("div.story--medium__info a")
     small = soup.select("div.story--small__text a")
     tiny = soup.select("div.story--tiny a")
-    hyperlink=link_into_array(huge,large,medium,small,tiny)
-    for j in range(len(hyperlink)):
+    hyperlink=np.append(hyperlink,link_into_array(huge,large,medium,small,tiny)) #第i頁的新聞連結全部存進np array
+    count=0
+    # for j in range(len(hyperlink)) :
+    for j in (j for j in range(len(hyperlink)) if i % 3==0) : #i每跑3次進一次迴圈
+      print("i",i,"j",j)
+      # print(len(hyperlink))
+      # print(hyperlink)
       date_add=''
       title=''
       content=''
@@ -51,14 +61,10 @@ if __name__ == '__main__':
       # 點進連結 爬內容
       sub_r = requests.get(link)
       sub_soup = BeautifulSoup(sub_r.text,"html.parser") #將網頁資料以html.parser
-      s_title=sub_soup.select("article.article__body h1")
-      s_imglink=sub_soup.select("article.article__body div.featured_image_container img")
+
       s_date_add = sub_soup.select("aside.article__info div.article__info__right time.article__info__date")[0].text.replace('\n', '').replace('  ', '').replace('\t', '')
-      s_content = sub_soup.select("article.article__body p")
-      if len(s_title[0])>0 :
-        title=s_title[0].text.replace('\n', '').replace('  ', '').replace('\t', '')
-      if len(s_content[0])>0 :
-        content=s_content[0].text
+      #取得此新聞的日期
+      #並format格式
       if str(s_date_add).find("sec") != -1:
         date_add=datetime.datetime.now().astimezone(pytz.utc)-datetime.timedelta(seconds=int(re.sub('\D', '', s_date_add)))
       if str(s_date_add).find("min") != -1:
@@ -68,16 +74,43 @@ if __name__ == '__main__':
       if str(s_date_add).find("day") != -1:
         date_add=datetime.datetime.now().astimezone(pytz.utc)-datetime.timedelta(days=int(re.sub('\D', '', s_date_add)))
 
+      print("lastnews",type(lastnews),lastnews)
+      print("dateadd",type(str(date_add)),str(date_add))
+      if lastnews>=str(date_add):
+        # 現有的新聞 比 這筆新聞還新
+        # 代表資料庫已經 存在了
+        # 不須再做後續
+        count+=1 #計數舊新聞
+        continue
+
+      s_imglink=sub_soup.select("article.article__body div.featured_image_container img")
       imglink=s_imglink[0]["src"]
+      s_content = sub_soup.select("article.article__body p")
+      s_title=sub_soup.select("article.article__body h1")
+      if len(s_title[0])>0 :
+        title=s_title[0].text.replace('\n', '').replace('  ', '').replace('\t', '')
+      if len(s_content[0])>0 :
+        content=s_content[0].text
       print(i,j,date_add)
       print(i,j,title)
-      print(i,j,content)
-      print(i,j,link)
-      print(i,j,imglink)
+      # print(i,j,content)
+      # print(i,j,link)
+      # print(i,j,imglink)
       news_list.append((date_add,title,content,website,link,imglink)) #存進tuple
-
-    print(news_list)
-    # insert_news_list(news_list)
+      # if lastnews>=str(date_add):
+    #   if count==0:
+    #     break
+    # else:
+    #   continue
+    # break
+    print("-----",i)
+    if i % 3==0: #進資料庫
+      news_list=sorted(news_list, reverse=True,key=lambda t:t[0])
+      insert_news_list(news_list)
+      print(news_list)
+      news_list=[]
+      hyperlink = np.array([])
+      if count>10: break #舊新聞大於10則結束程式
 
 
 
