@@ -8,8 +8,8 @@ from insert_news_list import insert_news_list
 
 if __name__ == '__main__':
   website="BBC"
-  # lastnews=str(select_news_lastdate("BBC"))
-  lastnews="2015-06-09T08:28:12.817Z"
+  lastnews=str(select_news_lastdate(website))
+  # lastnews="2015-06-09T08:28:12.817Z"
 
   url = 'https://www.bbc.com/news/topics/c734j90em14t/bitcoin'
   r = requests.get(url)
@@ -74,6 +74,8 @@ if __name__ == '__main__':
       # dateadd=當前資料的日期(已加進news_list) 底下有pop一次
       # lastnews>=dateadd 就離開雙層迴圈
       if lastnews>=dateadd:
+        print("lastnews",type(lastnews))
+        print("dateadd",type(dateadd))
         break
     else:
       continue
