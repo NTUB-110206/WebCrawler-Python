@@ -110,7 +110,7 @@ if __name__ == '__main__':
       print(news_list)
       news_list=[]
       hyperlink = np.array([])
-      if count>10: break #舊新聞大於10則結束程式
+      if count>9: break #舊新聞大於10則結束程式
 
 
 
