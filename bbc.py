@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import numpy as np
+import re
 
 from select_news_lastdate import select_news_lastdate
 from insert_news_list import insert_news_list
@@ -47,7 +48,7 @@ if __name__ == '__main__':
         content=news['summary']
         print(j, i, content)
       if 'image' in news:
-        imglink=news['image']['href']
+        imglink=re.sub(r'http', 'https', news['image']['href'])
         print(j, i, imglink)
       else:
         imglink="https://raw.githubusercontent.com/NTUB-110206/WEB/main/bcd/static/temp/pic/default_img.png"
