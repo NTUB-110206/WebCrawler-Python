@@ -51,7 +51,7 @@ if __name__ == '__main__':
         imglink=re.sub(r'http', 'https', news['image']['href'])
         print(j, i, imglink)
       else:
-        imglink="https://raw.githubusercontent.com/NTUB-110206/WEB/main/bcd/static/temp/pic/default_img.png"
+        imglink="https://i.imgur.com/EJDC9vb.png"
         print(j, i, imglink)
       if 'synopses' in news:
         if news['synopses']['medium'] != None:
