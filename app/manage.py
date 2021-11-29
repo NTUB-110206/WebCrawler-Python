@@ -1,4 +1,4 @@
-from app import app, WEB_API
+from app import app, WEB_API, fun
 from flask import jsonify
 from flask_cors import CORS
 
@@ -12,7 +12,8 @@ def index():
 
 @app.route('/bbc')
 def bbc():
-    return jsonify({'news': 'bbc'}), 200, {"function": "getNews"}
+    result = fun.bbc_crawler()
+    return result, 200, {"function": "bbc"}
 
 @app.route('/newsBitcoin')
 def newsBitcoin():
