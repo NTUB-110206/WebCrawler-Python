@@ -33,3 +33,11 @@ def get_bbcPage():
 def get_bbcNews_json(bbc_url):
     res = requests.get(bbc_url)
     return res.json()
+
+def get_newsBitcoin():
+    res = requests.get('https://news.bitcoin.com')
+    return res
+
+def get_newsBitcoinPages(page):
+    res = requests.get('https://news.bitcoin.com/page/'+page)
+    return res
