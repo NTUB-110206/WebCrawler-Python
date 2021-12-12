@@ -1,9 +1,10 @@
+from app import WEB_API
 from bs4 import BeautifulSoup
 import re
-from app.WEB_API import *
+from flask import jsonify
 
 def get_bbc_newsPage():
-    bbcPage = get_bbcPage()
+    bbcPage = WEB_API.get_bbcPage()
     soup = BeautifulSoup(bbcPage.text, "html.parser")  # 將網頁資料以html.parser
     total_page_number = soup.select("div.lx-pagination__details.gs-u-ph.qa-pagination-details span.lx-pagination__page-number.qa-pagination-total-page-number")[0].text
     print('總頁數: '+total_page_number+' 頁\n')
@@ -20,11 +21,7 @@ def get_bbc_newsPage_url(total_page_number):
     uuu = u1+str(total_page_number)+u3
     return uuu
 
-def get_bbc_news(last_date):
-    print(last_date)
-    total_page_number = get_bbc_newsPage()
-    bbc_url = get_bbc_newsPage_url(total_page_number)
-    result = get_bbcNews_json(bbc_url)
+def parse_bbc_news(last_date, result):
     news_list = []
     for newsPage in result['payload']:
         newsPages = newsPage['body']['results']
@@ -61,3 +58,18 @@ def get_bbc_news(last_date):
     # 多存一個所以pop出來
     return news_list
 
+
+def bbc_crawler():
+    # 資料庫內BBCNEWS最後一筆日期
+    last_date = WEB_API.get_lastNews_datetime('BBC')
+    # BBCNEWS總頁數
+    total_page_number = get_bbc_newsPage()
+    # 產生 BBCNEWS json 格式連結
+    bbc_url = get_bbc_newsPage_url(total_page_number)
+    # req bbc_url 取得 json 格式的新聞
+    result_json = WEB_API.get_bbcNews_json(bbc_url)
+    # 解析 bbc news 整理成後端要求的格式
+    newslist = parse_bbc_news(last_date, result_json)
+    # len(news)>0就送給後端, 否則回覆 "no new news"
+    result = WEB_API.post_newslist(newslist) if len(newslist) > 0 else jsonify({"result": "no new news"})
+    return result

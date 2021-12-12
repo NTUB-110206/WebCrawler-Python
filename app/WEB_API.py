@@ -5,6 +5,10 @@ import json
 backend_SERVERURL = os.getenv('Heroku_backend')
 NEWSAPI_APIKEY = os.getenv('NEWSAPI_APIKEY')
 
+def get_lastNews_datetime(news_website):
+    last_news = get_newslist(news_website, 1)
+    return last_news['data']['news'][0]['news_datetime']
+
 def get_newslist(news_website, limit):
     my_params = json.dumps({'news_website': news_website, 'limit': limit})
     res = requests.get(backend_SERVERURL+'/newslist', params=my_params)
