@@ -10,8 +10,7 @@ def get_lastNews_datetime(news_website):
     return last_news['data']['news'][0]['news_datetime']
 
 def get_newslist(news_website, limit):
-    my_params = json.dumps({'news_website': news_website, 'limit': limit})
-    res = requests.get(backend_SERVERURL+'/newslist', params=my_params)
+    res = requests.get(backend_SERVERURL+'/newslist?news_website='+news_website+'&limit='+str(limit))
     results = res.json()
     return results
 
