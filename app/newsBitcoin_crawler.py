@@ -1,26 +1,18 @@
-from bs4 import BeautifulSoup
 from app import WEB_API
 from app import utils
+from bs4 import BeautifulSoup
+from flask import jsonify
 
 def get_newsBitcoin_totalPage():
     newsBitcoinPage = WEB_API.get_newsBitcoin()
     soup = BeautifulSoup(newsBitcoinPage.text,"html.parser")
     total_page_number = (soup.select("div.page-nav.td-pb-padding-side a.last")[0].text).replace(',', '')
-    print('總頁數: '+total_page_number+' 頁\n')
     return int(total_page_number)
-
-def get_newsBitcoin_news(last_date):
-    total_page_number = get_newsBitcoin_totalPage()
-    print(str(total_page_number)+"--call page num--")
-    link_list = get_all_newsBitcoinlink(last_date, total_page_number)
-    print(str(link_list)+"--call link_list--")
-    return 123
 
 def get_all_newsBitcoinlink(last_date, total_page_number):
     soupData=[]
-    # for i in range(total_page_number+1):
-    for i in range(5):
-        print(str(i)+'--------------------------------')
+    for i in range(total_page_number+1):
+        print('第'+str(i)+'頁--------------------------------')
         newsPage = WEB_API.get_newsBitcoinPages(str(i))
         soup = BeautifulSoup(newsPage.text,"html.parser")
         huge = soup.select("div.story.story--huge a")
@@ -30,30 +22,48 @@ def get_all_newsBitcoinlink(last_date, total_page_number):
         tiny = soup.select("div.story--tiny a")
         theme = soup.select("div.story--theme a")
         soupData.extend([huge, large, medium, small, tiny, theme])
-        print(soupData)
-        datetime = soup.select("div.story__footer span")
+        datetime = soup.select("div.story__footer")
         for item in datetime:
             f_Datetime = utils.parseDatetime(item.text)
-            print(f_Datetime)
-            if last_date[:19] >= str(f_Datetime)[:19]:
-                print(str(f_Datetime))
+            
+            if (last_date.replace("T", " "))[:19] >= str(f_Datetime)[:19]:
+                print("BREAK", str(f_Datetime))
                 break
         else:
             continue
         break
             
-    links = list(set([item.get('href') for sublist in soupData for item in sublist]))
-    print(len(links))
+    link_list = list(set([item.get('href') for sublist in soupData for item in sublist]))
 
-    return 123
+    return link_list
+
+def single_news_crawler(link_list):
+    news_list=[]
+    for link in link_list:
+        news = WEB_API.get_newsBitcoin_singleNews(link)
+        single_news_soup = BeautifulSoup(news.text,"html.parser")
+        new_news = {}
+        new_news['news_link'] = link
+        new_news['news_title'] = (single_news_soup.select("article.article__body h1"))[0].text.replace('\n', '').replace('  ', '').replace('\t', '')
+        new_news['news_content'] = (single_news_soup.select("article.article__body p"))[0].text
+        new_news['news_datetime'] = str(utils.parseDatetime(single_news_soup.select("aside.article__info div.article__info__right time.article__info__date")[0].text.replace('\n', '').replace('  ', '').replace('\t', '')))
+        new_news['news_website'] = 'NEWS.BITCOIN'
+        new_news['img_link'] = (single_news_soup.select("article.article__body div.featured_image_container img"))[0]['src']
+        print(new_news)
+        news_list.append(new_news)
+    return news_list
 
 def newsBitcoin_crawler():
     last_date = WEB_API.get_lastNews_datetime('NEWS.BITCOIN')
     print('last_date '+last_date)
     total_page_number = get_newsBitcoin_totalPage()
-    print("total_page_number "+str(total_page_number))
-    print(type(total_page_number))
+    print('總頁數: '+total_page_number+' 頁')
     link_list = get_all_newsBitcoinlink(last_date, total_page_number)
-    print("link_list "+str(link_list))
-    
-    return 'newsBitcoin'
+    print("link_list "+link_list)
+    print('link_list total', len(link_list))
+    newslist = single_news_crawler(link_list)
+    print("link_list "+link_list)
+    # len(news)>0就送給後端, 否則回覆 "no new news"
+    result = WEB_API.post_newslist(newslist) if len(newslist) > 0 else jsonify({"result": "no new news"})
+    print(result)
+    return result

@@ -18,4 +18,4 @@ def bbc():
 @app.route('/newsBitcoin')
 def newsBitcoin():
     result = newsBitcoin_crawler.newsBitcoin_crawler()
-    return jsonify({'news': 'newsBitcoin'}), 200, {"function": "getNews"}
+    return result, 200, {"function": "getNews"}

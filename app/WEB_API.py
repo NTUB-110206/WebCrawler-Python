@@ -41,3 +41,7 @@ def get_newsBitcoin():
 def get_newsBitcoinPages(page):
     res = requests.get('https://news.bitcoin.com/page/'+page)
     return res
+
+def get_newsBitcoin_singleNews(link):
+    res = requests.get(link)
+    return res
