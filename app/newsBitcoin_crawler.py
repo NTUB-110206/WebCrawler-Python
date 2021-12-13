@@ -59,10 +59,10 @@ def newsBitcoin_crawler():
     total_page_number = get_newsBitcoin_totalPage()
     print('總頁數: '+str(total_page_number)+' 頁')
     link_list = get_all_newsBitcoinlink(last_date, total_page_number)
-    print("link_list "+link_list)
+    print(link_list)
     print('link_list total', len(link_list))
     newslist = single_news_crawler(link_list)
-    print("link_list "+link_list)
+    print(newslist)
     # len(news)>0就送給後端, 否則回覆 "no new news"
     result = WEB_API.post_newslist(newslist) if len(newslist) > 0 else jsonify({"result": "no new news"})
     print(result)
