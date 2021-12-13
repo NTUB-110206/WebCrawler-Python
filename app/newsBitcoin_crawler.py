@@ -12,7 +12,6 @@ def get_newsBitcoin_totalPage():
 def get_all_newsBitcoinlink(last_date, total_page_number):
     soupData=[]
     for i in range(total_page_number+1):
-        print('第'+str(i)+'頁--------------------------------')
         newsPage = WEB_API.get_newsBitcoinPages(str(i))
         soup = BeautifulSoup(newsPage.text,"html.parser")
         huge = soup.select("div.story.story--huge a")
@@ -49,7 +48,6 @@ def single_news_crawler(link_list):
         new_news['news_datetime'] = str(utils.parseDatetime(single_news_soup.select("aside.article__info div.article__info__right time.article__info__date")[0].text.replace('\n', '').replace('  ', '').replace('\t', '')))
         new_news['news_website'] = 'NEWS.BITCOIN'
         new_news['img_link'] = (single_news_soup.select("article.article__body div.featured_image_container img"))[0]['src']
-        print(new_news)
         news_list.append(new_news)
     return news_list
 

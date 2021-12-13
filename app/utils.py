@@ -14,7 +14,6 @@ def parseDatetime(date_str):
         date_str=datetime.datetime.now().astimezone(pytz.utc)-datetime.timedelta(days=int(re.sub('\D', '', date_str)))
     else:
         date_str = str(mdy_to_ymd(date_str.replace(" ", "")))+' 00:00:00'
-    print("parseDatetime",date_str)
     return date_str
 
 def mdy_to_ymd(d):
