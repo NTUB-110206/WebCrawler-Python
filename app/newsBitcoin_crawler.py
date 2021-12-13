@@ -57,7 +57,7 @@ def newsBitcoin_crawler():
     last_date = WEB_API.get_lastNews_datetime('NEWS.BITCOIN')
     print('last_date '+last_date)
     total_page_number = get_newsBitcoin_totalPage()
-    print('總頁數: '+total_page_number+' 頁')
+    print('總頁數: '+str(total_page_number)+' 頁')
     link_list = get_all_newsBitcoinlink(last_date, total_page_number)
     print("link_list "+link_list)
     print('link_list total', len(link_list))
