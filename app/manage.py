@@ -8,7 +8,7 @@ CORS(app, support_credentials=True)
 
 @app.route('/')
 def index():
-    return jsonify({'news': WEB_API.get_newslist('BBC', 1)}), 200, {"function": "getNews"}
+    return jsonify(WEB_API.get_newslist('BBC', 1)), 200, {"function": "getNews"}
 
 @app.route('/bbc')
 def bbc():
