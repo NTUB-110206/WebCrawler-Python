@@ -71,5 +71,6 @@ def bbc_crawler():
     # 解析 bbc news 整理成後端要求的格式
     newslist = parse_bbc_news(last_date, result_json)
     # len(news)>0就送給後端, 否則回覆 "no new news"
-    result = WEB_API.post_newslist(newslist) if len(newslist) > 0 else jsonify({"result": "no new news"})
-    return result
+    result = WEB_API.post_newslist(newslist) if len(newslist) > 0 else {"data": {"result": "no new news"}}
+
+    return jsonify({'news': newslist, 'result': result['data']['result']})
